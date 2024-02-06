@@ -6,10 +6,8 @@ public final class AuthActions {
     private AuthActions instance = null;
     private User loggedInUser;
     private Map<String, User> users;
-
     private AuthActions() {
     }
-
     public void registerUser(String userName, String password) {
         if (this.loggedInUser != null) {
             System.out.println("please log out first");
@@ -26,7 +24,6 @@ public final class AuthActions {
         this.loggedInUser = person;
         System.out.printf("Welcome, %s\n", userName);
     }
-
     public void loginUser(String userName, String password) {
         if (this.loggedInUser != null) {
             System.out.println("please log out first");
@@ -48,7 +45,9 @@ public final class AuthActions {
 
         System.out.println("Invalid username or password");
     }
-
+    public void logout() {
+        this.loggedInUser = null;
+    }
     public AuthActions getInstance() {
         if (this.instance == null) {
             this.instance = new AuthActions();
