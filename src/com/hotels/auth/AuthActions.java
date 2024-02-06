@@ -3,7 +3,7 @@ package com.hotels.auth;
 import java.util.Map;
 
 public final class AuthActions {
-    private AuthActions instance = null;
+    private static AuthActions instance = null;
     private User loggedInUser;
     private Map<String, User> users;
     private AuthActions() {
@@ -48,11 +48,14 @@ public final class AuthActions {
     public void logout() {
         this.loggedInUser = null;
     }
-    public AuthActions getInstance() {
-        if (this.instance == null) {
-            this.instance = new AuthActions();
+    public User getLoggedInUser() {
+        return this.loggedInUser;
+    }
+    public static AuthActions getInstance() {
+        if (instance == null) {
+            instance = new AuthActions();
         }
 
-        return this.instance;
+        return instance;
     }
 }
