@@ -1,6 +1,6 @@
-package com.ui;
+package com.hotels.ui;
 
-public class MenuItem {
+public class MenuItem implements Comparable<MenuItem> {
 
     private String message;
     public void action(){}
@@ -10,5 +10,10 @@ public class MenuItem {
     }
     public String getMessage() {
         return this.message;
+    }
+
+    @Override
+    public int compareTo(MenuItem o) {
+        return this.message.compareTo(o.getMessage());
     }
 }

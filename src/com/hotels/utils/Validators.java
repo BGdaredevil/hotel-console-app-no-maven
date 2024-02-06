@@ -1,4 +1,4 @@
-package com.utils;
+package com.hotels.utils;
 
 public class Validators {
 }

@@ -1,6 +1,6 @@
-package com.hotel.ui.hotel;
+package com.hotels;
 
-import com.hotel.hotel.Hotel;
+import com.hotels.hotel.Hotel;
 
 import java.util.List;
 
