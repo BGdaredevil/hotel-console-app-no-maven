@@ -2,35 +2,13 @@ package com.hotels.ui;
 
 import com.hotels.auth.AuthActions;
 import com.hotels.auth.User;
+import com.hotels.utils.Color;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Menu {
-    //    private Map<String, MenuItem> actions;
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_BLACK = "\u001B[30m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
-    public static final String ANSI_WHITE = "\u001B[37m";
-    private String[] loginMenu = {
-            "1. Username",
-            "2. Password",
-            "3. Submit",
-            "9. Exit"
-    };
-    private String[] registerMenu = {
-            "1. Username",
-            "2. Password",
-            "3. Repeat password",
-            "4. Submit",
-            "9. Exit"
-    };
 
     private String[] mainMenuGuest = {
             "1. View Rooms",
@@ -56,7 +34,7 @@ public class Menu {
 
         System.out.println("====== MAIN MENU ======");
         System.out.println(String.join("\n", isGuest ? mainMenuGuest : mainMenuUser));
-        System.out.println("Please select an item: ");
+        System.out.print("Please select an item: ");
         int selection;
 
         do {
@@ -77,21 +55,22 @@ public class Menu {
                 case 4:
                     return isGuest
 //                "4. Login"
-                            ? parrentMenu.login(sc, parrentMenu, "", "")
+                            ? parrentMenu.login(sc, parrentMenu, new HashMap<>())
 //                "4. Personal profile"
                             : parrentMenu.subMenuTwo(sc, parrentMenu);
 
                 case 5:
                     return isGuest
 //                "5. Register"
-                            ? parrentMenu.register(sc, parrentMenu, "", "", "")
+                            ? parrentMenu.register(sc, parrentMenu, new HashMap<>())
 //                "5. Admin portal"
                             : parrentMenu.subMenuTwo(sc, parrentMenu);
 
 //                "6. Logout"
                 case 6: {
                     if (isGuest) {
-                        System.out.println("Invalid selection");
+                        System.out.println(Color.color("red", "Invalid selection"));
+
                         break;
                     }
 
@@ -102,7 +81,8 @@ public class Menu {
                 case 9:
                     return null;
                 default:
-                    System.out.println("Invalid selection");
+                    System.out.println(Color.color("red", "Invalid selection"));
+
             }
 
         } while (selection != 9);
@@ -110,10 +90,22 @@ public class Menu {
         return parrentMenu;
     }
 
-    private Menu login(Scanner sc, Menu parrentMenu, String username, String password) {
-        System.out.println("====== LOGIN ======");
+    private Menu login(Scanner sc, Menu parrentMenu, Map<String, String> formData) {
+        if (formData.isEmpty()) {
+            formData.put("username", "");
+            formData.put("password", "");
+        }
 
-        System.out.println(String.join("\n", loginMenu));
+        String[] loginMenu = {
+                "====== LOGIN ======",
+                String.format("1. Username: %s", Color.color("green", formData.get("username"))),
+                String.format("2. Password: %s", Color.color("green", "*".repeat(formData.get("password").length()))),
+                "3. Submit",
+                "9. Exit",
+                "Please select an item: "
+        };
+        System.out.print(String.join("\n", loginMenu));
+
         int selection;
 
         do {
@@ -123,38 +115,38 @@ public class Menu {
                 case 1: {
                     System.out.print("Input: ");
                     String usernameInput = sc.nextLine();
-
-                    return parrentMenu.login(sc, parrentMenu, usernameInput, password);
+                    formData.put("username", usernameInput);
+                    return parrentMenu.login(sc, parrentMenu, formData);
                 }
                 case 2: {
                     System.out.print("Input: ");
                     String passwordInput = sc.nextLine();
-
-                    return parrentMenu.login(sc, parrentMenu, username, passwordInput);
+                    formData.put("password", passwordInput);
+                    return parrentMenu.login(sc, parrentMenu, formData);
                 }
                 case 3: {
-                    if (username.isEmpty()) {
-                        System.out.println("Please input username");
-                        return parrentMenu.login(sc, parrentMenu, username, password);
+                    if (formData.get("username").isEmpty()) {
+                        System.out.println(Color.color("red", "Please input username"));
+                        return parrentMenu.login(sc, parrentMenu, formData);
                     }
 
-                    if (password.isEmpty()) {
-                        System.out.println("Please input password");
-                        return parrentMenu.login(sc, parrentMenu, username, password);
+                    if (formData.get("password").isEmpty()) {
+                        System.out.println(Color.color("red", "Please input password"));
+                        return parrentMenu.login(sc, parrentMenu, formData);
                     }
 
                     System.out.print("Logging in...    ");
 
-                    if (AuthActions.getInstance().loginUser(username, password)) {
+                    if (AuthActions.getInstance().loginUser(formData.get("username"), formData.get("password"))) {
                         return parrentMenu.mainMenu(sc, parrentMenu);
                     }
 
-                    parrentMenu.login(sc, parrentMenu, username, password);
+                    parrentMenu.login(sc, parrentMenu, formData);
                 }
                 case 9:
                     return parrentMenu.mainMenu(sc, parrentMenu);
                 default:
-                    System.out.println("Invalid selection");
+                    System.out.println(Color.color("red", "Invalid selection"));
             }
 
         } while (selection != 9);
@@ -162,10 +154,23 @@ public class Menu {
         return parrentMenu;
     }
 
-    private Menu register(Scanner sc, Menu parrentMenu, String username, String password, String repeatPassword) {
-        System.out.println("====== REGISTER ======");
+    private Menu register(Scanner sc, Menu parrentMenu, Map<String, String> formData) {
+        if (formData.isEmpty()) {
+            formData.put("username", "");
+            formData.put("password", "");
+            formData.put("repeatPassword", "");
+        }
+        String[] registerMenu = {
+                "====== REGISTER ======",
+                String.format("1. Username: %s", Color.color("green", formData.get("username"))),
+                String.format("2. Password: %s", Color.color("green", "*".repeat(formData.get("password").length()))),
+                String.format("3. Repeat password: %s", Color.color("green", "*".repeat(formData.get("repeatPassword").length()))),
+                "4. Submit",
+                "9. Exit",
+                "Please select an item: "
+        };
+        System.out.print(String.join("\n", registerMenu));
 
-        System.out.println(String.join("\n", registerMenu));
         int selection;
 
         do {
@@ -175,48 +180,51 @@ public class Menu {
                 case 1: {
                     System.out.print("Input: ");
                     String usernameInput = sc.nextLine();
-
-                    return parrentMenu.register(sc, parrentMenu, usernameInput, password, repeatPassword);
+                    formData.put("username", usernameInput);
+                    return parrentMenu.register(sc, parrentMenu, formData);
                 }
                 case 2: {
                     System.out.print("Input: ");
                     String passwordInput = sc.nextLine();
-
-                    return parrentMenu.register(sc, parrentMenu, username, passwordInput, repeatPassword);
+                    formData.put("password", passwordInput);
+                    return parrentMenu.register(sc, parrentMenu, formData);
                 }
                 case 3: {
                     System.out.print("Input: ");
                     String repeatPasswordInput = sc.nextLine();
-
-                    return parrentMenu.register(sc, parrentMenu, username, password, repeatPasswordInput);
+                    formData.put("repeatPassword", repeatPasswordInput);
+                    return parrentMenu.register(sc, parrentMenu, formData);
                 }
                 case 4: {
-                    if (username.isEmpty()) {
-                        System.out.println("Please input username");
-                        return parrentMenu.register(sc, parrentMenu, username, password, repeatPassword);
+                    if (formData.get("username").isEmpty()) {
+                        System.out.println(Color.color("red", "Please input username"));
+                        return parrentMenu.register(sc, parrentMenu, formData);
                     }
 
-                    if (password.isEmpty()) {
-                        System.out.println("Please input password");
-                        return parrentMenu.register(sc, parrentMenu, username, password, repeatPassword);
+                    if (formData.get("password").isEmpty()) {
+                        System.out.println(Color.color("red", "Please input password"));
+
+                        return parrentMenu.register(sc, parrentMenu, formData);
                     }
-                    if (!password.equals(repeatPassword)) {
-                        System.out.println("Passwords do not match");
-                        return parrentMenu.register(sc, parrentMenu, username, password, repeatPassword);
+                    if (!formData.get("password").equals(formData.get("repeatPassword"))) {
+                        System.out.println(Color.color("red", "Passwords do not match"));
+
+                        return parrentMenu.register(sc, parrentMenu, formData);
                     }
 
                     System.out.print("Registering...    ");
 
-                    if (AuthActions.getInstance().registerUser(username, password)) {
+                    if (AuthActions.getInstance().registerUser(formData.get("username"), formData.get("password"))) {
                         return parrentMenu.mainMenu(sc, parrentMenu);
                     }
 
-                    parrentMenu.register(sc, parrentMenu, username, password, repeatPassword);
+                    parrentMenu.register(sc, parrentMenu, formData);
                 }
                 case 9:
                     return parrentMenu.mainMenu(sc, parrentMenu);
                 default:
-                    System.out.println("Invalid selection");
+                    System.out.println(Color.color("red", "Invalid selection"));
+
             }
 
         } while (selection != 9);
@@ -240,7 +248,9 @@ public class Menu {
                 case 9:
                     return parrentMenu.mainMenu(sc, parrentMenu);
                 default:
-                    System.out.println("Invalid selection");
+
+                    System.out.println(Color.color("red", "Invalid selection"));
+
             }
 
         } while (selection != 9);
@@ -265,7 +275,7 @@ public class Menu {
                 case 9:
                     return parrentMenu.mainMenu(sc, parrentMenu);
                 default:
-                    System.out.println("Invalid selection");
+                    System.out.println(Color.color("red", "Invalid selection"));
             }
 
         } while (selection != 9);

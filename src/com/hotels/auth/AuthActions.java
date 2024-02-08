@@ -1,5 +1,7 @@
 package com.hotels.auth;
 
+import com.hotels.utils.Color;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,12 +17,13 @@ public final class AuthActions {
     }
     public boolean registerUser(String userName, String password) {
         if (this.loggedInUser != null) {
-            System.out.println("please log out first");
+            System.out.println(Color.color("red", "please log out first"));
             return false;
         }
 
         if (users.containsKey(userName)) {
-            System.out.println("Invalid input (username taken)");
+            System.out.println(Color.color("red", "Invalid input (username taken)"));
+
             return false;
         }
         String hashedPassword = String.valueOf(password.hashCode());
@@ -28,31 +31,30 @@ public final class AuthActions {
         users.put(userName, person);
         this.loggedInUser = person;
 
-        System.out.printf("Welcome, %s\n", userName);
-
+        System.out.println(Color.color("green", String.format("Welcome, %s\n", userName)));
         return true;
     }
 
     public boolean loginUser(String userName, String password) {
         if (this.loggedInUser != null) {
-            System.out.println("please log out first");
+            System.out.println(Color.color("red", "please log out first"));
             return false;
         }
 
         if (!users.containsKey(userName)) {
-            System.out.println("Invalid username or password");
+            System.out.println(Color.color("red", "Invalid username or password"));
             return false;
         }
+
         String hashedPassword = String.valueOf(password.hashCode());
         User person = users.get(userName);
-
         if (User.verifyPassword(person, hashedPassword)) {
-            System.out.printf("Welcome, %s\n", userName);
+            System.out.println(Color.color("green", String.format("Welcome, %s\n", userName)));
             this.loggedInUser = person;
             return true;
         }
 
-        System.out.println("Invalid username or password");
+        System.out.println(Color.color("red", "Invalid username or password"));
         return false;
     }
 
