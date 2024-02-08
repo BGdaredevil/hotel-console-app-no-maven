@@ -9,11 +9,10 @@ import java.util.Scanner;
 
 public class Main {
     private static final Scanner sc = new Scanner(System.in);
+
     public static void main(String[] args) {
         Menu app = new Menu();
-        app = app.mainMenu(sc, app);
+        app.mainMenu(sc, app);
         System.out.println("stopped");
-
     }
-
 }
