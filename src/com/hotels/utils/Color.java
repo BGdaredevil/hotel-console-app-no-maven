@@ -1,6 +1,6 @@
 package com.hotels.utils;
 
-public class Color {
+public final class Color {
     //    private Map<String, MenuItem> actions;
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_BLACK = "\u001B[30m";
