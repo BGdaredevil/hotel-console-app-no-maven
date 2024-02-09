@@ -1,6 +1,20 @@
 {
-  "username": "namePesho2",
-  "password": "passwordPesho2",
-  "adminAccessLevel": {},
-  "bookingHistory": {}
+  "pesho": {
+    "username": "pesho",
+    "password": "106557093",
+    "adminAccessLevel": {},
+    "bookingHistory": {}
+  },
+  "gosho": {
+    "username": "gosho",
+    "password": "98543314",
+    "adminAccessLevel": {},
+    "bookingHistory": {}
+  },
+  "123": {
+    "username": "123",
+    "password": "48690",
+    "adminAccessLevel": {},
+    "bookingHistory": {}
+  }
 }

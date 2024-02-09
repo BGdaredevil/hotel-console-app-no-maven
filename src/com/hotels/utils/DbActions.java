@@ -1,9 +1,12 @@
 package com.hotels.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
+import com.hotels.auth.User;
 
 import java.io.*;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class DbActions {
     private static String storeAddress = "./db-json-store";
@@ -36,23 +39,53 @@ public final class DbActions {
         return instance;
     }
 
-    public <T> void writeObjectToFile(T object, String fileName) {
+    public <T> void writeObjectToFile(T object, String fileName) throws IOException {
         String path = DbActions.getPath(fileName);
         String serialized = gson.toJson(object);
 
         this.writeFile(serialized, path);
     }
 
-    public <T> T readObjectFromFile(String fileName, Class<T> targetClass) {
+    public <T> ArrayDeque<T> readObjectArrFromFile(String fileName, Class<T> targetClass) throws IOException {
+        String path = DbActions.getPath(fileName);
+        String serialized = this.readFile(path);
+        JsonArray items = JsonParser.parseString(serialized).getAsJsonArray();
+        ArrayDeque<T> result = new ArrayDeque<>(items.size());
+
+        items.forEach(item -> result.add(gson.fromJson(item, targetClass)));
+
+        return result;
+    }
+
+    public <T> Map<String, T> readObjectMapFromFile(String fileName, Class<T> targetClass) throws IOException {
+        String path = DbActions.getPath(fileName);
+        String serialized = this.readFile(path);
+
+        JsonObject items = JsonParser.parseString(serialized).getAsJsonObject();
+
+        Map<String, T> restored = new HashMap<>(items.size());
+
+        items.entrySet().forEach((entry) -> {
+            String key = entry.getKey();
+            JsonElement val = entry.getValue();
+            T parsed = gson.fromJson(val, targetClass);
+            restored.put(key, parsed);
+        });
+
+        return restored;
+    }
+
+    public <T> T readObjectFromFile(String fileName, Class<T> targetClass) throws IOException {
         String path = DbActions.getPath(fileName);
         String serialized = this.readFile(path);
 
         T object = gson.fromJson(serialized, targetClass);
 
         return object;
+
     }
 
-    private String readFile(String path) {
+    private String readFile(String path) throws IOException {
         StringBuilder result = new StringBuilder();
 
         try (FileReader stream = new FileReader(path); BufferedReader in = new BufferedReader(stream)) {
@@ -63,17 +96,13 @@ public final class DbActions {
             }
 
             return result.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    private void writeFile(String data, String path) {
+    private void writeFile(String data, String path) throws IOException {
         try (FileWriter fw = new FileWriter(path); PrintWriter out = new PrintWriter(fw)) {
             out.print(data);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
