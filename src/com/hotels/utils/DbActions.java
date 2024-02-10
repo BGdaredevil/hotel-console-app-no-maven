@@ -1,12 +1,9 @@
 package com.hotels.utils;
 
 import com.google.gson.*;
-import com.hotels.auth.User;
 
 import java.io.*;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public final class DbActions {
     private static String storeAddress = "./db-json-store";
@@ -14,21 +11,13 @@ public final class DbActions {
 
     private final Gson gson;
 
-    private DbActions() {
-        gson = new GsonBuilder().setPrettyPrinting().create();
-    }
-
     private DbActions(String address) {
         storeAddress = "./" + address;
         gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
     public static DbActions getInstance() {
-        if (instance == null) {
-            instance = new DbActions();
-        }
-
-        return instance;
+        return DbActions.getInstance("db-json-store");
     }
 
     public static DbActions getInstance(String address) {
@@ -65,12 +54,9 @@ public final class DbActions {
 
         Map<String, T> restored = new HashMap<>(items.size());
 
-        items.entrySet().forEach((entry) -> {
-            String key = entry.getKey();
-            JsonElement val = entry.getValue();
-            T parsed = gson.fromJson(val, targetClass);
-            restored.put(key, parsed);
-        });
+        items.entrySet().forEach((entry) ->
+                restored.put(entry.getKey(), gson.fromJson(entry.getValue(), targetClass))
+        );
 
         return restored;
     }
@@ -110,3 +96,4 @@ public final class DbActions {
         return storeAddress + "/" + fileName;
     }
 }
+
