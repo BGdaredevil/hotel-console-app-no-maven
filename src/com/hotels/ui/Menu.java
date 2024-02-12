@@ -69,7 +69,7 @@ public class Menu {
 //                "5. Register"
                             ? parrentMenu.register(sc, parrentMenu, new HashMap<>())
 //                "5. Admin portal"
-                            : parrentMenu.subMenuTwo(sc, parrentMenu);
+                            : parrentMenu.adminPortal(sc, parrentMenu);
 
 //                "6. Logout"
                 case 6: {
@@ -95,16 +95,19 @@ public class Menu {
         return parrentMenu;
     }
 
-    private Menu login(Scanner sc, Menu parrentMenu, Map<String, String> formData) {
+    private Menu login(Scanner sc, Menu parrentMenu, Map<String, FormDataItem<String>> formData) {
         if (formData.isEmpty()) {
-            formData.put("username", "");
-            formData.put("password", "");
+            FormDataItem<String> usernameInput = new FormDataItem<>("", (v) -> Validators.length(3, 12, v), "Username should be between 3 and 12 characters long.");
+            FormDataItem<String> passwordInput = new FormDataItem<>("", (v) -> Validators.length(3, 12, v), "Password should be between 3 and 12 characters long and must match repeat password.");
+
+            formData.put("username", usernameInput);
+            formData.put("password", passwordInput);
         }
 
         String[] loginMenu = {
                 "====== LOGIN ======",
-                String.format("1. Username: %s", Color.color("green", formData.get("username"))),
-                String.format("2. Password: %s", Color.color("green", "*".repeat(formData.get("password").length()))),
+                String.format("1. Username: %s", formData.get("username").getState(false)),
+                String.format("2. Password: %s", formData.get("password").getState(true)),
                 "3. Submit",
                 "9. Exit",
                 "Please select an item: "
@@ -120,29 +123,28 @@ public class Menu {
                 case 1: {
                     System.out.print("Input: ");
                     String usernameInput = sc.nextLine();
-                    formData.put("username", usernameInput);
+                    formData.get("username").setValue(usernameInput);
+
                     return parrentMenu.login(sc, parrentMenu, formData);
                 }
                 case 2: {
                     System.out.print("Input: ");
                     String passwordInput = sc.nextLine();
-                    formData.put("password", passwordInput);
+                    formData.get("password").setValue(passwordInput);
+
                     return parrentMenu.login(sc, parrentMenu, formData);
                 }
                 case 3: {
-                    if (formData.get("username").isEmpty()) {
-                        System.out.println(Color.color("red", "Please input username"));
-                        return parrentMenu.login(sc, parrentMenu, formData);
-                    }
+                    FormDataItem<String> usernameForm = formData.get("username");
+                    FormDataItem<String> passwordForm = formData.get("password");
 
-                    if (formData.get("password").isEmpty()) {
-                        System.out.println(Color.color("red", "Please input password"));
+                    if (!formData.get("username").isValid() || !formData.get("password").isValid()) {
                         return parrentMenu.login(sc, parrentMenu, formData);
                     }
 
                     System.out.print("Logging in...    ");
 
-                    if (AuthActions.getInstance().loginUser(formData.get("username"), formData.get("password"))) {
+                    if (AuthActions.getInstance().loginUser(usernameForm.getValue(), passwordForm.getValue())) {
                         return parrentMenu.mainMenu(sc, parrentMenu);
                     }
 
@@ -229,6 +231,121 @@ public class Menu {
                 default:
                     System.out.println(Color.color("red", "Invalid selection"));
 
+            }
+
+        } while (selection != 9);
+
+        return parrentMenu;
+    }
+
+    private Menu adminPortal(Scanner sc, Menu parrentMenu) {
+        String[] menuOptions = {
+                "====== ADMIN PANEL ======",
+                "1. Create hotel",
+                "2. Edit hotel",
+                "3. Delete hotel",
+                "9. Exit",
+                "Please select an item: "
+        };
+        System.out.print(String.join("\n", menuOptions));
+
+        int selection;
+
+        do {
+            selection = this.getSelection(sc);
+
+            switch (selection) {
+                case 1:
+                    return parrentMenu.modifyHotel(sc, parrentMenu, new HashMap<>(), true);
+                case 2: {
+                    // get hotel data and prepopulate
+
+                    return parrentMenu.modifyHotel(sc, parrentMenu, new HashMap<>(), false);
+                }
+
+                case 9:
+                    return parrentMenu.mainMenu(sc, parrentMenu);
+                default:
+                    System.out.println(Color.color("red", "Invalid selection"));
+            }
+
+        } while (selection != 9);
+
+        return parrentMenu;
+    }
+
+    private Menu modifyHotel(Scanner sc, Menu parrentMenu, Map<String, FormDataItem<?>> formData, boolean createMode) {
+        if (formData.isEmpty()) {
+            formData.put("counts", new FormDataItem<>("", (v) -> {
+                try {
+                    boolean result = true;
+                    int[] items = Arrays.stream(v.split("\\s+,\\s+")).mapToInt(Integer::parseInt).toArray();
+
+                    for (int item : items) {
+                        result = result && Validators.moreThan(0, item);
+                        if (!result) {
+                            return result;
+                        }
+                    }
+
+                    return result;
+                } catch (Exception e) {
+                    return false;
+                }
+
+            }, "Rooms count should be positive integers"));
+            formData.put("capacities", new FormDataItem<>("", (v) -> {
+                try {
+                    boolean result = true;
+                    int[] items = Arrays.stream(v.split("\\s+,\\s+")).mapToInt(Integer::parseInt).toArray();
+
+                    for (int item : items) {
+                        result = result && Validators.moreThan(0, item);
+                        if (!result) {
+                            return result;
+                        }
+                    }
+
+                    return result;
+                } catch (Exception e) {
+                    return false;
+                }
+            }, "Rooms capacities should be positive integers"));
+            formData.put("prices", new FormDataItem<>("", (v) -> {
+                return true;
+            }, "Rooms prices should be positive real numbers"));
+            formData.put("cancellationFees", new FormDataItem<>("", (v) -> {
+                return true;
+            }, "Rooms cancellation fees should be between 0 and 100 %"));
+            formData.put("amenities", new FormDataItem<>("", (v) -> {
+                return true;
+            }, "Rooms amenities should be separated with a space"));
+        }
+
+        String[] menuOptions = {
+                (createMode ? "====== CREATE HOTEL ======" : "====== EDIT HOTEL ======"),
+                "1. Name:",
+                "2. Rooms count CSV ({regular}, {deluxe}):",
+                "3. Rooms capacity CSV ({regular}, {deluxe}):",
+                "4. Pricing CSV ({regular}, {deluxe}):",
+                "5. Cancellation fees CSV ({regular}, {deluxe}):",
+                "6. Amenities CSV ({regular1 regular2}, {deluxe1 deluxe2}):",
+                "9. Exit",
+                "Please select an item: "
+        };
+        System.out.print(String.join("\n", menuOptions));
+
+        int selection;
+
+        do {
+            selection = this.getSelection(sc);
+
+            switch (selection) {
+
+                case 9:
+                    return parrentMenu.adminPortal(sc, parrentMenu);
+                default:
+                    System.out.println(Color.color("red", "Invalid selection"));
             }
 
         } while (selection != 9);

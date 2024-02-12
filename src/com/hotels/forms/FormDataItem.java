@@ -33,14 +33,6 @@ public class FormDataItem<T> {
         this.isValid = this.validator.apply(value);
     }
 
-
-//    public FormDataItem<T> setValidationState(boolean validationResult, String validationMessage) {
-//        this.isValid = validationResult;
-//        this.validationMessage = validationMessage;
-//
-//        return this;
-//    }
-
     public String getState(boolean hideValue) {
         String color = this.isValid ? "green" : "red";
         String value = hideValue ? "*".repeat(String.valueOf(this.value).length()) : String.valueOf(this.value);
