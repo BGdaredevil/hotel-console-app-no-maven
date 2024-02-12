@@ -2,7 +2,9 @@ package com.hotels.ui;
 
 import com.hotels.auth.AuthActions;
 import com.hotels.auth.User;
+import com.hotels.forms.FormDataItem;
 import com.hotels.utils.Color;
+import com.hotels.utils.Validators;
 
 import java.io.File;
 import java.io.IOException;
@@ -157,17 +159,21 @@ public class Menu {
         return parrentMenu;
     }
 
-    private Menu register(Scanner sc, Menu parrentMenu, Map<String, String> formData) {
+    private Menu register(Scanner sc, Menu parrentMenu, Map<String, FormDataItem<String>> formData) {
         if (formData.isEmpty()) {
-            formData.put("username", "");
-            formData.put("password", "");
-            formData.put("repeatPassword", "");
+            FormDataItem<String> usernameField = new FormDataItem<>("", (v) -> Validators.length(3, 12, v), "Username should be between 3 and 12 characters long.");
+            FormDataItem<String> passwordField = new FormDataItem<>("", (v) -> Validators.length(3, 12, v), "Password should be between 3 and 12 characters long and must match repeat password.");
+            FormDataItem<String> repeatPasswordField = new FormDataItem<>("", (v) -> passwordField.getValue().equals(v), "Passwords should match");
+
+            formData.put("username", usernameField);
+            formData.put("password", passwordField);
+            formData.put("repeatPassword", repeatPasswordField);
         }
         String[] registerMenu = {
                 "====== REGISTER ======",
-                String.format("1. Username: %s", Color.color("green", formData.get("username"))),
-                String.format("2. Password: %s", Color.color("green", "*".repeat(formData.get("password").length()))),
-                String.format("3. Repeat password: %s", Color.color("green", "*".repeat(formData.get("repeatPassword").length()))),
+                String.format("1. Username: %s", formData.get("username").getState(false)),
+                String.format("2. Password: %s", formData.get("password").getState(true)),
+                String.format("3. Repeat password: %s", formData.get("repeatPassword").getState(true)),
                 "4. Submit",
                 "9. Exit",
                 "Please select an item: "
@@ -183,41 +189,36 @@ public class Menu {
                 case 1: {
                     System.out.print("Input: ");
                     String usernameInput = sc.nextLine();
-                    formData.put("username", usernameInput);
+                    formData.get("username").setValue(usernameInput);
                     return parrentMenu.register(sc, parrentMenu, formData);
                 }
                 case 2: {
                     System.out.print("Input: ");
                     String passwordInput = sc.nextLine();
-                    formData.put("password", passwordInput);
+                    formData.get("password").setValue(passwordInput);
+                    formData.get("repeatPassword").isValid();
+
                     return parrentMenu.register(sc, parrentMenu, formData);
                 }
                 case 3: {
                     System.out.print("Input: ");
                     String repeatPasswordInput = sc.nextLine();
-                    formData.put("repeatPassword", repeatPasswordInput);
+                    formData.get("repeatPassword").setValue(repeatPasswordInput);
+
                     return parrentMenu.register(sc, parrentMenu, formData);
                 }
                 case 4: {
-                    if (formData.get("username").isEmpty()) {
-                        System.out.println(Color.color("red", "Please input username"));
-                        return parrentMenu.register(sc, parrentMenu, formData);
-                    }
+                    boolean usernameIsValid = formData.get("username").isValid();
+                    boolean passwordIsValid = formData.get("password").isValid();
+                    boolean repeatPasswordIsValid = formData.get("repeatPassword").isValid();
 
-                    if (formData.get("password").isEmpty()) {
-                        System.out.println(Color.color("red", "Please input password"));
-
-                        return parrentMenu.register(sc, parrentMenu, formData);
-                    }
-                    if (!formData.get("password").equals(formData.get("repeatPassword"))) {
-                        System.out.println(Color.color("red", "Passwords do not match"));
-
+                    if (!usernameIsValid || !passwordIsValid || !repeatPasswordIsValid) {
                         return parrentMenu.register(sc, parrentMenu, formData);
                     }
 
                     System.out.print("Registering...    ");
 
-                    if (AuthActions.getInstance().registerUser(formData.get("username"), formData.get("password"))) {
+                    if (AuthActions.getInstance().registerUser(formData.get("username").getValue(), formData.get("password").getValue())) {
                         return parrentMenu.mainMenu(sc, parrentMenu);
                     }
 

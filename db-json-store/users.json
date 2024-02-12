@@ -1,4 +1,10 @@
 {
+  "": {
+    "username": "",
+    "password": "0",
+    "adminAccessLevel": {},
+    "bookingHistory": {}
+  },
   "123": {
     "username": "123",
     "password": "48690",
