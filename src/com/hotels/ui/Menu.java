@@ -11,36 +11,37 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Menu {
-
-    private String[] mainMenuGuest = {
-            "1. View Rooms",
-            "2. Book a Room",
-            "3. Cancel booking",
-            "4. Login",
-            "5. Register",
-            "9. Exit"
-    };
-    private String[] mainMenuUser = {
-            "1. View Rooms",
-            "2. Book a Room",
-            "3. Cancel booking",
-            "4. Personal profile",
-            "5. Admin portal",
-            "6. Logout",
-            "9. Exit"
-    };
-
     public Menu mainMenu(Scanner sc, Menu parrentMenu) {
+        String[] mainMenuGuest = {
+                "====== MAIN MENU ======",
+                "1. View Rooms",
+                "2. Book a Room",
+                "3. Cancel booking",
+                "4. Login",
+                "5. Register",
+                "9. Exit",
+                "Please select an item: "
+        };
+
+        String[] mainMenuUser = {
+                "====== MAIN MENU ======",
+                "1. View Rooms",
+                "2. Book a Room",
+                "3. Cancel booking",
+                "4. Personal profile",
+                "5. Admin portal",
+                "6. Logout",
+                "9. Exit",
+                "Please select an item: "
+        };
         User person = AuthActions.getInstance().getLoggedInUser();
         boolean isGuest = person == null;
 
-        System.out.println("====== MAIN MENU ======");
-        System.out.println(String.join("\n", isGuest ? mainMenuGuest : mainMenuUser));
-        System.out.print("Please select an item: ");
+        System.out.print(String.join("\n", isGuest ? mainMenuGuest : mainMenuUser));
         int selection;
 
         do {
-            selection = Integer.parseInt(sc.nextLine());
+            selection = this.getSelection(sc);
 
             switch (selection) {
 //              "1. View Rooms"
@@ -111,7 +112,7 @@ public class Menu {
         int selection;
 
         do {
-            selection = Integer.parseInt(sc.nextLine());
+            selection = this.getSelection(sc);
 
             switch (selection) {
                 case 1: {
@@ -176,7 +177,7 @@ public class Menu {
         int selection;
 
         do {
-            selection = Integer.parseInt(sc.nextLine());
+            selection = this.getSelection(sc);
 
             switch (selection) {
                 case 1: {
@@ -234,6 +235,15 @@ public class Menu {
         return parrentMenu;
     }
 
+    private int getSelection(Scanner sc) {
+        try {
+            return Integer.parseInt(sc.nextLine());
+        } catch (Exception e) {
+            System.out.println(Color.color("red", "Invalid selection"));
+            return getSelection(sc);
+        }
+    }
+
     private Menu subMenuOne(Scanner sc, Menu parrentMenu) {
         System.out.println("one");
         System.out.println(String.join("\n", "1. sub one"));
@@ -284,25 +294,4 @@ public class Menu {
 
         return parrentMenu;
     }
-
-//    public Menu(MenuItem... items) {
-////        this.actions = new TreeMap<>(
-////                IntStream.range(1, items.length).boxed().collect(Collectors.toMap(
-////                        String::valueOf,
-////                        (i) -> items[i - 1]
-////                ))
-////        );
-//
-//    }
-
-//    public void printMenu() {
-//        String menu = this.actions.values().stream().map(MenuItem::getMessage).collect(Collectors.joining("\n"));
-//        System.out.println(menu);
-//    }
-//
-//    public MenuItem getSelection(String index) {
-//        System.out.printf("%d item selected", index);
-//        return actions.get(index);
-//    }
-
 }
