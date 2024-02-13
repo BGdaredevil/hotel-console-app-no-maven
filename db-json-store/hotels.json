@@ -1,0 +1,87 @@
+{
+  "name": {
+    "name": "name",
+    "rooms": [
+      {
+        "type": "Standard",
+        "number": 1,
+        "price": 4.0,
+        "cancellationFee": 4.2,
+        "amenities": [
+          "asdasda",
+          "asd",
+          "asd",
+          "sad",
+          "asd",
+          "asd",
+          "a"
+        ],
+        "capacity": 3,
+        "classNameForSerialization": "com.hotels.room.StandardRoom"
+      },
+      {
+        "type": "Standard",
+        "number": 2,
+        "price": 4.0,
+        "cancellationFee": 4.2,
+        "amenities": [
+          "asdasda",
+          "asd",
+          "asd",
+          "sad",
+          "asd",
+          "asd",
+          "a"
+        ],
+        "capacity": 3,
+        "classNameForSerialization": "com.hotels.room.StandardRoom"
+      },
+      {
+        "type": "Deluxe",
+        "number": 3,
+        "price": 5.0,
+        "cancellationFee": 5.3,
+        "amenities": [
+          "sad",
+          "ad",
+          "asa",
+          "sadadsasas",
+          "a"
+        ],
+        "capacity": 4,
+        "classNameForSerialization": "com.hotels.room.DeluxeRoom"
+      },
+      {
+        "type": "Deluxe",
+        "number": 4,
+        "price": 5.0,
+        "cancellationFee": 5.3,
+        "amenities": [
+          "sad",
+          "ad",
+          "asa",
+          "sadadsasas",
+          "a"
+        ],
+        "capacity": 4,
+        "classNameForSerialization": "com.hotels.room.DeluxeRoom"
+      },
+      {
+        "type": "Deluxe",
+        "number": 5,
+        "price": 5.0,
+        "cancellationFee": 5.3,
+        "amenities": [
+          "sad",
+          "ad",
+          "asa",
+          "sadadsasas",
+          "a"
+        ],
+        "capacity": 4,
+        "classNameForSerialization": "com.hotels.room.DeluxeRoom"
+      }
+    ],
+    "bookings": {}
+  }
+}

@@ -30,6 +30,10 @@ public class Hotel {
         this.bookings.get(userName).push(booking);
     }
 
+    public void setRooms(List<Room> rooms) {
+        this.rooms = rooms;
+    }
+
     // todo:
     // edit rooms
     // income

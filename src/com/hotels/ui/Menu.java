@@ -3,14 +3,12 @@ package com.hotels.ui;
 import com.hotels.auth.AuthActions;
 import com.hotels.auth.User;
 import com.hotels.forms.FormDataItem;
+import com.hotels.hotel.Hotel;
+import com.hotels.hotel.HotelService;
 import com.hotels.utils.Color;
 import com.hotels.utils.Validators;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Menu {
     public Menu mainMenu(Scanner sc, Menu parrentMenu) {
@@ -244,6 +242,7 @@ public class Menu {
                 "1. Create hotel",
                 "2. Edit hotel",
                 "3. Delete hotel",
+                "4. Select hotel",
                 "9. Exit",
                 "Please select an item: "
         };
@@ -262,7 +261,14 @@ public class Menu {
 
                     return parrentMenu.modifyHotel(sc, parrentMenu, new HashMap<>(), false);
                 }
-
+                case 3: {
+                    System.out.println("todo ");
+                    return parrentMenu.adminPortal(sc, parrentMenu);
+                }
+                case 4: {
+                    System.out.println("todo list my hotels and input a select");
+                    return parrentMenu.adminPortal(sc, parrentMenu);
+                }
                 case 9:
                     return parrentMenu.mainMenu(sc, parrentMenu);
                 default:
@@ -276,11 +282,25 @@ public class Menu {
 
     private Menu modifyHotel(Scanner sc, Menu parrentMenu, Map<String, FormDataItem<?>> formData, boolean createMode) {
         if (formData.isEmpty()) {
+            int roomTypesCount = HotelService.getTypesCount();
+            formData.put("name", new FormDataItem<>("", (v) -> {
+                try {
+                    // todo alphanumeric characters regex
+
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
+
+            }, "Hotel name should contain only alphanumeric characters."));
             formData.put("counts", new FormDataItem<>("", (v) -> {
                 try {
-                    boolean result = true;
-                    int[] items = Arrays.stream(v.split("\\s+,\\s+")).mapToInt(Integer::parseInt).toArray();
+                    int[] items = HotelService.processCountsCapacities(v);
+                    if (items.length != roomTypesCount) {
+                        return false;
+                    }
 
+                    boolean result = true;
                     for (int item : items) {
                         result = result && Validators.moreThan(0, item);
                         if (!result) {
@@ -296,9 +316,12 @@ public class Menu {
             }, "Rooms count should be positive integers"));
             formData.put("capacities", new FormDataItem<>("", (v) -> {
                 try {
-                    boolean result = true;
-                    int[] items = Arrays.stream(v.split("\\s+,\\s+")).mapToInt(Integer::parseInt).toArray();
+                    int[] items = HotelService.processCountsCapacities(v);
+                    if (items.length != roomTypesCount) {
+                        return false;
+                    }
 
+                    boolean result = true;
                     for (int item : items) {
                         result = result && Validators.moreThan(0, item);
                         if (!result) {
@@ -312,24 +335,67 @@ public class Menu {
                 }
             }, "Rooms capacities should be positive integers"));
             formData.put("prices", new FormDataItem<>("", (v) -> {
-                return true;
+                try {
+                    double[] items = HotelService.processPricesFees(v);
+                    if (items.length != roomTypesCount) {
+                        return false;
+                    }
+
+                    boolean result = true;
+                    for (double item : items) {
+                        result = result && Validators.moreThan(0.01, item);
+                        if (!result) {
+                            return result;
+                        }
+                    }
+
+                    return result;
+                } catch (Exception e) {
+                    return false;
+                }
             }, "Rooms prices should be positive real numbers"));
             formData.put("cancellationFees", new FormDataItem<>("", (v) -> {
-                return true;
+                try {
+                    double[] items = HotelService.processPricesFees(v);
+                    if (items.length != roomTypesCount) {
+                        return false;
+                    }
+
+                    boolean result = true;
+                    for (double item : items) {
+                        result = result && Validators.moreThan(0.01, item);
+                        if (!result) {
+                            return result;
+                        }
+                    }
+
+                    return result;
+                } catch (Exception e) {
+                    return false;
+                }
             }, "Rooms cancellation fees should be between 0 and 100 %"));
             formData.put("amenities", new FormDataItem<>("", (v) -> {
+                // todo alphanumeric regex validation
                 return true;
             }, "Rooms amenities should be separated with a space"));
         }
 
+        FormDataItem<String> nameInput = (FormDataItem<String>) formData.get("name");
+        FormDataItem<String> countsInput = (FormDataItem<String>) formData.get("counts");
+        FormDataItem<String> capacitiesInput = (FormDataItem<String>) formData.get("capacities");
+        FormDataItem<String> pricesInput = (FormDataItem<String>) formData.get("prices");
+        FormDataItem<String> cancellationFeesInput = (FormDataItem<String>) formData.get("cancellationFees");
+        FormDataItem<String> amenitiesInput = (FormDataItem<String>) formData.get("amenities");
+
         String[] menuOptions = {
                 (createMode ? "====== CREATE HOTEL ======" : "====== EDIT HOTEL ======"),
-                "1. Name:",
-                "2. Rooms count CSV ({regular}, {deluxe}):",
-                "3. Rooms capacity CSV ({regular}, {deluxe}):",
-                "4. Pricing CSV ({regular}, {deluxe}):",
-                "5. Cancellation fees CSV ({regular}, {deluxe}):",
-                "6. Amenities CSV ({regular1 regular2}, {deluxe1 deluxe2}):",
+                String.format("1. Name: %s", formData.get("name").getState(false)),
+                String.format("2. Rooms count CSV ({regular}, {deluxe}): %s", formData.get("counts").getState(false)),
+                String.format("3. Rooms capacity CSV ({regular}, {deluxe}): %s", formData.get("capacities").getState(false)),
+                String.format("4. Pricing CSV ({regular}, {deluxe}): %s", formData.get("prices").getState(false)),
+                String.format("5. Cancellation fees CSV ({regular}, {deluxe}): %s", formData.get("cancellationFees").getState(false)),
+                String.format("6. Amenities CSV ({regular1 regular2}, {deluxe1 deluxe2}): %s", formData.get("amenities").getState(false)),
+                "7. Submit",
                 "9. Exit",
                 "Please select an item: "
         };
@@ -339,9 +405,30 @@ public class Menu {
 
         do {
             selection = this.getSelection(sc);
-
             switch (selection) {
-
+                case 1:
+                    nameInput.setValue(sc.nextLine());
+                    return parrentMenu.modifyHotel(sc, parrentMenu, formData, createMode);
+                case 2:
+                    countsInput.setValue(sc.nextLine());
+                    return parrentMenu.modifyHotel(sc, parrentMenu, formData, createMode);
+                case 3:
+                    capacitiesInput.setValue(sc.nextLine());
+                    return parrentMenu.modifyHotel(sc, parrentMenu, formData, createMode);
+                case 4:
+                    pricesInput.setValue(sc.nextLine());
+                    return parrentMenu.modifyHotel(sc, parrentMenu, formData, createMode);
+                case 5:
+                    cancellationFeesInput.setValue(sc.nextLine());
+                    return parrentMenu.modifyHotel(sc, parrentMenu, formData, createMode);
+                case 6:
+                    amenitiesInput.setValue(sc.nextLine());
+                    return parrentMenu.modifyHotel(sc, parrentMenu, formData, createMode);
+                case 7: {
+                    Hotel hotel = HotelService.getInstance().create(nameInput.getValue(), countsInput.getValue(), capacitiesInput.getValue(), pricesInput.getValue(), cancellationFeesInput.getValue(), amenitiesInput.getValue());
+                    AuthActions.getInstance().getLoggedInUser().setAdmin(Hotel.getName(hotel));
+                    return parrentMenu.adminPortal(sc, parrentMenu);
+                }
                 case 9:
                     return parrentMenu.adminPortal(sc, parrentMenu);
                 default:

@@ -1,6 +1,8 @@
 package com.hotels.utils;
 
 import com.google.gson.*;
+import com.hotels.room.Room;
+import com.hotels.room.RoomDeserializer;
 
 import java.io.*;
 import java.util.*;
@@ -13,7 +15,7 @@ public final class DbActions {
 
     private DbActions(String address) {
         storeAddress = "./" + address;
-        gson = new GsonBuilder().setPrettyPrinting().create();
+        gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Room.class, new RoomDeserializer()).create();
     }
 
     public static DbActions getInstance() {
@@ -88,7 +90,6 @@ public final class DbActions {
     private void writeFile(String data, String path) throws IOException {
         try (FileWriter fw = new FileWriter(path); PrintWriter out = new PrintWriter(fw)) {
             out.print(data);
-
         }
     }
 

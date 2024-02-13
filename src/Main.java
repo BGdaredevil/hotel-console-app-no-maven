@@ -2,6 +2,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.hotels.auth.AuthActions;
 import com.hotels.auth.User;
+import com.hotels.hotel.HotelService;
 import com.hotels.ui.Menu;
 import com.hotels.ui.MenuItem;
 import com.hotels.utils.DbActions;

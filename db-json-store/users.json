@@ -1,32 +1,14 @@
 {
-  "": {
-    "username": "",
-    "password": "0",
-    "adminAccessLevel": {},
-    "bookingHistory": {}
-  },
-  "123": {
-    "username": "123",
-    "password": "48690",
-    "adminAccessLevel": {},
-    "bookingHistory": {}
-  },
   "pesho": {
     "username": "pesho",
     "password": "106557093",
-    "adminAccessLevel": {},
+    "adminAccessLevel": [],
     "bookingHistory": {}
   },
   "gosho": {
     "username": "gosho",
     "password": "98543314",
-    "adminAccessLevel": {},
-    "bookingHistory": {}
-  },
-  "asddd": {
-    "username": "asddd",
-    "password": "93106802",
-    "adminAccessLevel": {},
+    "adminAccessLevel": [],
     "bookingHistory": {}
   }
 }

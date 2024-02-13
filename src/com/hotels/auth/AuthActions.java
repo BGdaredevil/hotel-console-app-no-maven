@@ -23,7 +23,7 @@ public final class AuthActions {
 
         } catch (IOException e) {
 //            throw new RuntimeException(e);
-            System.out.println(e.getMessage());
+            System.out.println(Color.backgroundColor("red", e.getMessage()));
         }
     }
 

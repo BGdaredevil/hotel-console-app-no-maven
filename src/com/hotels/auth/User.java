@@ -1,8 +1,5 @@
 package com.hotels.auth;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.hotels.hotel.Booking;
 import com.hotels.hotel.Hotel;
 
@@ -11,15 +8,14 @@ import java.util.*;
 public class User {
     public final String username;
     private final String password;
-    private Map<String, String> adminAccessLevel;
+    private Set<String> adminAccessLevel;
     private Map<String, ArrayDeque<Booking>> bookingHistory;
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
         this.bookingHistory = new HashMap<>();
-        this.adminAccessLevel = new HashMap<>();
-
+        this.adminAccessLevel = new HashSet<>();
     }
 
     public static boolean verifyPassword(User person, String givenPassword) {
@@ -37,4 +33,19 @@ public class User {
         this.bookingHistory.get(hotelName).push(booking);
     }
 
+    public Set<String> getAdminHotels() {
+        return this.adminAccessLevel;
+    }
+
+    public void setAdmin(String hotelName) {
+        this.adminAccessLevel.add(hotelName);
+    }
+
+    public void removeAdmin(String hotelName) {
+        this.adminAccessLevel.remove(hotelName);
+    }
+
+    public boolean isAdmin(String hotelName) {
+        return this.adminAccessLevel.contains(hotelName);
+    }
 }

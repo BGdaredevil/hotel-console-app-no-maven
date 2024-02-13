@@ -17,15 +17,15 @@ public final class Validators {
     }
 
     /* numbers */
-    public static <T extends Number & Comparable> boolean moreThan(T min, T value) {
+    public static <T extends Number & Comparable<T>> boolean moreThan(T min, T value) {
         return value.compareTo(min) >= 0;
     }
 
-    public static <T extends Number & Comparable> boolean lessThan(T max, T value) {
+    public static <T extends Number & Comparable<T>> boolean lessThan(T max, T value) {
         return value.compareTo(max) <= 0;
     }
 
-    public static <T extends Number & Comparable> boolean between(T min, T max, T value) {
+    public static <T extends Number & Comparable<T>> boolean between(T min, T max, T value) {
         return Validators.lessThan(max, value) && Validators.moreThan(min, value);
     }
 
