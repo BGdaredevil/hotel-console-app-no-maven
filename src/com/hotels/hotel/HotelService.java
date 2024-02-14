@@ -73,6 +73,10 @@ public class HotelService {
         this.hotelContext = this.getHotelByName(hotelName);
     }
 
+    public List<String> listHotels() {
+        return this.hotels.values().stream().map(Hotel::getName).toList();
+    }
+
     public Hotel create(String name, String countConfig, String capacityConfig, String priceConfig, String feesConfig, String amenitiesConfig) {
         Hotel hotel = new Hotel(name);
         int[] counts = HotelService.processCountsCapacities(countConfig);
@@ -107,7 +111,7 @@ public class HotelService {
     }
 
     // todo update hotel
-    // delete hotel
+
     public void deleteHotel(String name) {
         Hotel target = this.getHotelByName(name);
         if (target == null) {
@@ -138,6 +142,14 @@ public class HotelService {
 
     public static int getTypesCount() {
         return HotelService.typesCount;
+    }
+
+    public static void save() {
+        try {
+            DbActions.getInstance().writeObjectToFile(HotelService.getInstance().hotels, hotelsDbAddress);
+        } catch (IOException e) {
+            System.out.println(Color.backgroundColor("red", e.getMessage()));
+        }
     }
 
     public static HotelService getInstance() {

@@ -35,7 +35,24 @@ public class Menu {
                 "Please select an item: "
         };
         User person = AuthActions.getInstance().getLoggedInUser();
+        Hotel hotelContext = HotelService.getInstance().getHotelContext();
         boolean isGuest = person == null;
+        boolean isHotel = hotelContext != null;
+
+        StringBuilder heading = new StringBuilder();
+        heading.append("====== MAIN MENU ======");
+        String delimiter = " | ";
+
+        if (!isGuest) {
+            heading.append(delimiter).append("Logged in as: ").append(person.username);
+        }
+
+        if (isHotel) {
+            heading.append(delimiter).append("selected hotel: ").append(Hotel.getName(hotelContext));
+        }
+
+        mainMenuUser[0] = heading.toString();
+        mainMenuGuest[0] = heading.toString();
 
         System.out.print(String.join("\n", isGuest ? mainMenuGuest : mainMenuUser));
         int selection;
@@ -302,12 +319,18 @@ public class Menu {
                 }
                 case 4: {
                     System.out.println("Please select a hotel:");
-                    Set<String> userHotels = AuthActions.getInstance().getLoggedInUser().getAdminHotels();
-                    userHotels.forEach(System.out::println);
+                    List<String> hotels = HotelService.getInstance().listHotels();
+
+                    if (hotels.isEmpty()) {
+                        System.out.println("There are no registered hotels");
+                        return parrentMenu.adminPortal(sc, parrentMenu);
+                    }
+
+                    hotels.forEach(System.out::println);
                     System.out.print("Input: ");
                     String input = sc.nextLine();
 
-                    if (!userHotels.contains(input)) {
+                    if (!hotels.contains(input)) {
                         System.out.println(Color.color("red", "Invalid selection"));
                         return parrentMenu.adminPortal(sc, parrentMenu);
                     }

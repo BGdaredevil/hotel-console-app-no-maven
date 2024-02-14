@@ -91,4 +91,12 @@ public final class AuthActions {
 
         return instance;
     }
+
+    public static void save() {
+        try {
+            DbActions.getInstance().writeObjectToFile(AuthActions.getInstance().users, "users.json");
+        } catch (IOException e) {
+            System.out.println(Color.backgroundColor("red", e.getMessage()));
+        }
+    }
 }

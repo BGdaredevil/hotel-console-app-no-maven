@@ -1,6 +1,7 @@
 {
   "name": {
     "name": "name",
+    "deleted": false,
     "rooms": [
       {
         "type": "Standard",
