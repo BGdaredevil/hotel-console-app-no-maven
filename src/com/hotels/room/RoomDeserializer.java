@@ -22,11 +22,9 @@ public class RoomDeserializer implements JsonDeserializer<Room>, JsonSerializer<
 
     @Override
     public JsonElement serialize(Room src, Type typeOfSrc, JsonSerializationContext context) {
-
-
-        Gson gson = new Gson(); //without this line it will not work
-        gson.toJson(src, src.getClass()); //and this one
-        JsonElement jsonElement = gson.toJsonTree(src); //it needs to replace to another method...toJsonTree
+        Gson gson = new Gson();
+        gson.toJson(src, src.getClass());
+        JsonElement jsonElement = gson.toJsonTree(src);
         jsonElement.getAsJsonObject().addProperty(className, src.getClass().getCanonicalName());
         return jsonElement;
     }

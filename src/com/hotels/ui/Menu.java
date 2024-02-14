@@ -258,16 +258,64 @@ public class Menu {
                     return parrentMenu.modifyHotel(sc, parrentMenu, new HashMap<>(), true);
                 case 2: {
                     // get hotel data and prepopulate
+                    System.out.println("Please select a hotel:");
+                    Set<String> userHotels = AuthActions.getInstance().getLoggedInUser().getAdminHotels();
+                    userHotels.forEach(System.out::println);
+                    System.out.print("Input: ");
+                    String input = sc.nextLine();
 
-                    return parrentMenu.modifyHotel(sc, parrentMenu, new HashMap<>(), false);
+                    if (!userHotels.contains(input)) {
+                        System.out.println(Color.color("red", "Invalid selection"));
+                        return parrentMenu.adminPortal(sc, parrentMenu);
+                    }
+
+                    Hotel itemToEdit = HotelService.getInstance().getHotelByName(input);
+                    System.out.println("selected: " + Hotel.getName(itemToEdit));
+                    System.out.println("Editing is not available at this time.");
+
+                    return parrentMenu.adminPortal(sc, parrentMenu);
                 }
                 case 3: {
-                    System.out.println("todo ");
+                    System.out.println("Please select a hotel:");
+                    Set<String> userHotels = AuthActions.getInstance().getLoggedInUser().getAdminHotels();
+                    userHotels.forEach(System.out::println);
+                    System.out.print("Input: ");
+                    String input = sc.nextLine();
+
+                    if (!userHotels.contains(input)) {
+                        System.out.println(Color.color("red", "Invalid selection"));
+                        return parrentMenu.adminPortal(sc, parrentMenu);
+                    }
+
+                    System.out.print("Confirm? y/n: ");
+
+                    String choice = sc.nextLine();
+
+                    if (choice.equals("y")) {
+                        HotelService.getInstance().deleteHotel(input);
+                        System.out.println(Color.color("green", "deleted " + input));
+                    } else {
+                        System.out.println(Color.color("green", "cancelled"));
+                    }
+
                     return parrentMenu.adminPortal(sc, parrentMenu);
                 }
                 case 4: {
-                    System.out.println("todo list my hotels and input a select");
-                    return parrentMenu.adminPortal(sc, parrentMenu);
+                    System.out.println("Please select a hotel:");
+                    Set<String> userHotels = AuthActions.getInstance().getLoggedInUser().getAdminHotels();
+                    userHotels.forEach(System.out::println);
+                    System.out.print("Input: ");
+                    String input = sc.nextLine();
+
+                    if (!userHotels.contains(input)) {
+                        System.out.println(Color.color("red", "Invalid selection"));
+                        return parrentMenu.adminPortal(sc, parrentMenu);
+                    }
+
+                    HotelService.getInstance().setHotelContext(input);
+                    System.out.println(Color.color("green", "Selected " + input));
+
+                    return parrentMenu.mainMenu(sc, parrentMenu);
                 }
                 case 9:
                     return parrentMenu.mainMenu(sc, parrentMenu);
@@ -407,21 +455,27 @@ public class Menu {
             selection = this.getSelection(sc);
             switch (selection) {
                 case 1:
+                    System.out.print("Input ");
                     nameInput.setValue(sc.nextLine());
                     return parrentMenu.modifyHotel(sc, parrentMenu, formData, createMode);
                 case 2:
+                    System.out.print("Input ");
                     countsInput.setValue(sc.nextLine());
                     return parrentMenu.modifyHotel(sc, parrentMenu, formData, createMode);
                 case 3:
+                    System.out.print("Input ");
                     capacitiesInput.setValue(sc.nextLine());
                     return parrentMenu.modifyHotel(sc, parrentMenu, formData, createMode);
                 case 4:
+                    System.out.print("Input ");
                     pricesInput.setValue(sc.nextLine());
                     return parrentMenu.modifyHotel(sc, parrentMenu, formData, createMode);
                 case 5:
+                    System.out.print("Input ");
                     cancellationFeesInput.setValue(sc.nextLine());
                     return parrentMenu.modifyHotel(sc, parrentMenu, formData, createMode);
                 case 6:
+                    System.out.print("Input ");
                     amenitiesInput.setValue(sc.nextLine());
                     return parrentMenu.modifyHotel(sc, parrentMenu, formData, createMode);
                 case 7: {

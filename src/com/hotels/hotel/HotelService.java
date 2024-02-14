@@ -39,7 +39,17 @@ public class HotelService {
 
     // get one
     public Hotel getHotelByName(String name) {
-        return hotels.getOrDefault(name, null);
+        Hotel item = hotels.getOrDefault(name, null);
+
+        if (item == null) {
+            return item;
+        }
+
+        if (Hotel.isDeleted(item)) {
+            return null;
+        }
+
+        return item;
     }
 
     // get all for logged in user
@@ -59,8 +69,8 @@ public class HotelService {
         return this.hotelContext;
     }
 
-    public void setHotelContext(Hotel hotelContext) {
-        this.hotelContext = hotelContext;
+    public void setHotelContext(String hotelName) {
+        this.hotelContext = this.getHotelByName(hotelName);
     }
 
     public Hotel create(String name, String countConfig, String capacityConfig, String priceConfig, String feesConfig, String amenitiesConfig) {
@@ -96,8 +106,24 @@ public class HotelService {
         return hotel;
     }
 
-    // update hotel
+    // todo update hotel
     // delete hotel
+    public void deleteHotel(String name) {
+        Hotel target = this.getHotelByName(name);
+        if (target == null) {
+            return;
+        }
+
+        User currentUser = AuthActions.getInstance().getLoggedInUser();
+        if (currentUser.isAdmin(name)) {
+            currentUser.removeAdmin(name);
+            if (this.hotelContext.equals(target)) {
+                this.hotelContext = null;
+            }
+            target.setDeleted();
+        }
+    }
+
     public static int[] processCountsCapacities(String data) {
         return Arrays.stream(data.split(HotelService.csvSplitRegex)).mapToInt(Integer::parseInt).toArray();
     }

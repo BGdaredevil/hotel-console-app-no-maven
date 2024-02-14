@@ -7,6 +7,7 @@ import java.util.*;
 
 public class Hotel {
     private String name;
+    private boolean deleted = false;
     private List<Room> rooms;
     private Map<String, ArrayDeque<Booking>> bookings;
 
@@ -32,6 +33,14 @@ public class Hotel {
 
     public void setRooms(List<Room> rooms) {
         this.rooms = rooms;
+    }
+
+    public void setDeleted() {
+        this.deleted = true;
+    }
+
+    public static boolean isDeleted(Hotel item) {
+        return item.deleted;
     }
 
     // todo:
