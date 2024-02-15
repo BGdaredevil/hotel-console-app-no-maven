@@ -12,32 +12,11 @@ import java.util.*;
 
 public class Menu {
     public Menu mainMenu(Scanner sc, Menu parrentMenu) {
-        String[] mainMenuGuest = {
-                "====== MAIN MENU ======",
-                "1. View Rooms",
-                "2. Book a Room",
-                "3. Cancel booking",
-                "4. Login",
-                "5. Register",
-                "9. Exit",
-                "Please select an item: "
-        };
-
-        String[] mainMenuUser = {
-                "====== MAIN MENU ======",
-                "1. View Rooms",
-                "2. Book a Room",
-                "3. Cancel booking",
-                "4. Personal profile",
-                "5. Admin portal",
-                "6. Logout",
-                "9. Exit",
-                "Please select an item: "
-        };
         User person = AuthActions.getInstance().getLoggedInUser();
         Hotel hotelContext = HotelService.getInstance().getHotelContext();
         boolean isGuest = person == null;
         boolean isHotel = hotelContext != null;
+        List<String> mainMenuItems = new ArrayList<>();
 
         StringBuilder heading = new StringBuilder();
         heading.append("====== MAIN MENU ======");
@@ -51,6 +30,30 @@ public class Menu {
             heading.append(delimiter).append("selected hotel: ").append(Hotel.getName(hotelContext));
         }
 
+        String[] mainMenuGuest = {
+                "====== MAIN MENU ======",
+                "1. Select Hotel",
+                "2. Book a Room",
+                "3. Cancel booking",
+                "4. Login",
+                "5. Register",
+                "9. Exit",
+                "Please select an item: "
+        };
+
+        String[] mainMenuUser = {
+                "====== MAIN MENU ======",
+                "1. Select Hotel",
+//                "View Rooms"
+                "2. Book a Room",
+                "3. Cancel booking",
+                "4. Personal profile",
+                "5. Admin portal",
+                "6. Logout",
+                "9. Exit",
+                "Please select an item: "
+        };
+
         mainMenuUser[0] = heading.toString();
         mainMenuGuest[0] = heading.toString();
 
@@ -61,9 +64,30 @@ public class Menu {
             selection = this.getSelection(sc);
 
             switch (selection) {
-//              "1. View Rooms"
-                case 1:
-                    return parrentMenu.subMenuOne(sc, parrentMenu);
+//              "1. Select hotel"
+                case 1: {
+                    System.out.println("Please select a hotel:");
+                    List<String> hotels = HotelService.getInstance().listHotels();
+
+                    if (hotels.isEmpty()) {
+                        System.out.println("There are no registered hotels");
+                        return parrentMenu.mainMenu(sc, parrentMenu);
+                    }
+
+                    hotels.forEach(System.out::println);
+                    System.out.print("Input: ");
+                    String input = sc.nextLine();
+
+                    if (!hotels.contains(input)) {
+                        System.out.println(Color.color("red", "Invalid selection"));
+                        return parrentMenu.mainMenu(sc, parrentMenu);
+                    }
+
+                    HotelService.getInstance().setHotelContext(input);
+                    System.out.println(Color.color("green", "Selected " + input));
+
+                    return parrentMenu.mainMenu(sc, parrentMenu);
+                }
 
 //              "2. Book a Room"
                 case 2:
@@ -259,7 +283,6 @@ public class Menu {
                 "1. Create hotel",
                 "2. Edit hotel",
                 "3. Delete hotel",
-                "4. Select hotel",
                 "9. Exit",
                 "Please select an item: "
         };
@@ -317,29 +340,7 @@ public class Menu {
 
                     return parrentMenu.adminPortal(sc, parrentMenu);
                 }
-                case 4: {
-                    System.out.println("Please select a hotel:");
-                    List<String> hotels = HotelService.getInstance().listHotels();
 
-                    if (hotels.isEmpty()) {
-                        System.out.println("There are no registered hotels");
-                        return parrentMenu.adminPortal(sc, parrentMenu);
-                    }
-
-                    hotels.forEach(System.out::println);
-                    System.out.print("Input: ");
-                    String input = sc.nextLine();
-
-                    if (!hotels.contains(input)) {
-                        System.out.println(Color.color("red", "Invalid selection"));
-                        return parrentMenu.adminPortal(sc, parrentMenu);
-                    }
-
-                    HotelService.getInstance().setHotelContext(input);
-                    System.out.println(Color.color("green", "Selected " + input));
-
-                    return parrentMenu.mainMenu(sc, parrentMenu);
-                }
                 case 9:
                     return parrentMenu.mainMenu(sc, parrentMenu);
                 default:
