@@ -17,6 +17,7 @@ public class Menu {
         boolean isGuest = person == null;
         boolean isHotel = hotelContext != null;
         List<String> mainMenuItems = new ArrayList<>();
+        int menuItemLabel = 1;
 
         StringBuilder heading = new StringBuilder();
         heading.append("====== MAIN MENU ======");
@@ -30,34 +31,57 @@ public class Menu {
             heading.append(delimiter).append("selected hotel: ").append(Hotel.getName(hotelContext));
         }
 
-        String[] mainMenuGuest = {
-                "====== MAIN MENU ======",
-                "1. Select Hotel",
-                "2. Book a Room",
-                "3. Cancel booking",
-                "4. Login",
-                "5. Register",
-                "9. Exit",
-                "Please select an item: "
-        };
+        mainMenuItems.add(heading.toString());
+        mainMenuItems.add(String.format("%d. Select Hotel", menuItemLabel++));              // 1
 
-        String[] mainMenuUser = {
-                "====== MAIN MENU ======",
-                "1. Select Hotel",
-//                "View Rooms"
-                "2. Book a Room",
-                "3. Cancel booking",
-                "4. Personal profile",
-                "5. Admin portal",
-                "6. Logout",
-                "9. Exit",
-                "Please select an item: "
-        };
+        if (isHotel) {
+            mainMenuItems.add(String.format("%d. View Rooms", menuItemLabel++));                                      // 2 (isHotel)
+            mainMenuItems.add(String.format("%d. Book a Room", menuItemLabel++));                                     // 3 (isHotel)
+            mainMenuItems.add(String.format("%d. Cancel booking", menuItemLabel++));                                  // 4 (isHotel)
+        }
 
-        mainMenuUser[0] = heading.toString();
-        mainMenuGuest[0] = heading.toString();
+        if (isGuest) {
+            mainMenuItems.add(String.format("%d. Login", menuItemLabel++));                 // 2 (!isHotel && isGuest) | 5 (isHotel && isGuest)
+            mainMenuItems.add(String.format("%d. Register", menuItemLabel));                // 3 (!isHotel && isGuest) | 6 (isHotel && isGuest)
+        } else {
+            mainMenuItems.add(String.format("%d. Personal profile", menuItemLabel++));       // 2 (!isHotel && !isGuest) | 5 (isHotel && !isGuest)
+            mainMenuItems.add(String.format("%d. Admin portal", menuItemLabel++));           // 3 (!isHotel && !isGuest) | 6 (isHotel && !isGuest)
+            mainMenuItems.add(String.format("%d. Logout", menuItemLabel));                   // 4 (!isHotel && !isGuest) | 7 (isHotel && !isGuest)
+        }
 
-        System.out.print(String.join("\n", isGuest ? mainMenuGuest : mainMenuUser));
+        mainMenuItems.add("9. Exit");
+        mainMenuItems.add("Please select an item: ");
+
+        System.out.println(String.join("\n", mainMenuItems));
+
+//        String[] mainMenuGuest = {
+//                "====== MAIN MENU ======",
+//                "1. Select Hotel",
+//                "2. Book a Room",
+//                "3. Cancel booking",
+//                "4. Login",
+//                "5. Register",
+//                "9. Exit",
+//                "Please select an item: "
+//        };
+//
+//        String[] mainMenuUser = {
+//                "====== MAIN MENU ======",
+//                "1. Select Hotel",
+////                "View Rooms"
+//                "2. Book a Room",
+//                "3. Cancel booking",
+//                "4. Personal profile",
+//                "5. Admin portal",
+//                "6. Logout",
+//                "9. Exit",
+//                "Please select an item: "
+//        };
+
+//        mainMenuUser[0] = heading.toString();
+//        mainMenuGuest[0] = heading.toString();
+//
+//        System.out.print(String.join("\n", isGuest ? mainMenuGuest : mainMenuUser));
         int selection;
 
         do {
@@ -66,7 +90,7 @@ public class Menu {
             switch (selection) {
 //              "1. Select hotel"
                 case 1: {
-                    System.out.println("Please select a hotel:");
+                    System.out.println("Please select a hotel (9 to deselect current):");
                     List<String> hotels = HotelService.getInstance().listHotels();
 
                     if (hotels.isEmpty()) {
@@ -78,6 +102,11 @@ public class Menu {
                     System.out.print("Input: ");
                     String input = sc.nextLine();
 
+                    if (input.equals("9")) {
+                        HotelService.getInstance().setHotelContext("input equals null to deselect");
+                        return parrentMenu.mainMenu(sc, parrentMenu);
+                    }
+
                     if (!hotels.contains(input)) {
                         System.out.println(Color.color("red", "Invalid selection"));
                         return parrentMenu.mainMenu(sc, parrentMenu);
@@ -88,40 +117,86 @@ public class Menu {
 
                     return parrentMenu.mainMenu(sc, parrentMenu);
                 }
+//              "2. View Rooms || Login || Personal profile"
+                case 2: {
+                    if (isHotel) {
+                        // View Rooms
+                        return parrentMenu.subMenuOne(sc, parrentMenu);
+                    }
 
-//              "2. Book a Room"
-                case 2:
+                    if (isGuest) {
+                        return parrentMenu.login(sc, parrentMenu, new HashMap<>());
+                    }
+
+                    // Personal profile
                     return parrentMenu.subMenuOne(sc, parrentMenu);
+                }
+//              "3. Book a Room || Register || Admin portal"
+                case 3: {
+                    if (isHotel) {
+                        // Book a Room
+                        return parrentMenu.subMenuOne(sc, parrentMenu);
+                    }
 
-//                "3. Cancel booking"
-                case 3:
-                    return parrentMenu.subMenuOne(sc, parrentMenu);
-                case 4:
-                    return isGuest
-//                "4. Login"
-                            ? parrentMenu.login(sc, parrentMenu, new HashMap<>())
-//                "4. Personal profile"
-                            : parrentMenu.subMenuTwo(sc, parrentMenu);
+                    if (isGuest) {
+                        return parrentMenu.register(sc, parrentMenu, new HashMap<>());
+                    }
 
-                case 5:
-                    return isGuest
-//                "5. Register"
-                            ? parrentMenu.register(sc, parrentMenu, new HashMap<>())
-//                "5. Admin portal"
-                            : parrentMenu.adminPortal(sc, parrentMenu);
+                    return parrentMenu.adminPortal(sc, parrentMenu);
+                }
+//              "4. Cancel booking || Logout"
+                case 4: {
+                    if (isHotel) {
+                        // Cancel booking
+                        return parrentMenu.subMenuTwo(sc, parrentMenu);
+                    }
 
-//                "6. Logout"
-                case 6: {
                     if (isGuest) {
                         System.out.println(Color.color("red", "Invalid selection"));
-
                         break;
                     }
 
                     AuthActions.getInstance().logout();
-
                     return parrentMenu.mainMenu(sc, parrentMenu);
                 }
+//              "5. Login || Personal profile"
+                case 5: {
+                    if (!isHotel) {
+                        System.out.println(Color.color("red", "Invalid selection"));
+                        break;
+                    }
+
+                    if (isGuest) {
+                        return parrentMenu.login(sc, parrentMenu, new HashMap<>());
+                    } else {
+                        // Personal profile
+                        return parrentMenu.subMenuOne(sc, parrentMenu);
+                    }
+                }
+//              "6. Register || Admin portal"
+                case 6: {
+                    if (!isHotel) {
+                        System.out.println(Color.color("red", "Invalid selection"));
+                        break;
+                    }
+
+                    if (isGuest) {
+                        return parrentMenu.register(sc, parrentMenu, new HashMap<>());
+                    } else {
+                        return parrentMenu.adminPortal(sc, parrentMenu);
+                    }
+                }
+//              "7. Logout"
+                case 7: {
+                    if (isHotel && !isGuest) {
+                        AuthActions.getInstance().logout();
+                        return parrentMenu.mainMenu(sc, parrentMenu);
+                    }
+
+                    System.out.println(Color.color("red", "Invalid selection"));
+                    break;
+                }
+//              "9. Exit"
                 case 9:
                     return null;
                 default:
