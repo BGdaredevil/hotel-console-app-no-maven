@@ -16,6 +16,11 @@ public class DeluxeRoom extends Room {
     }
 
     @Override
+    public String getSpecification() {
+        return String.format("Capacity: %d; Type: %s; Price: %.2f; Cancellation fee: %.2f; Amenities: %s", super.getCapacity(), this.type, this.price, this.cancellationFee, String.join(", ", this.amenities));
+    }
+
+    @Override
     Double setCancellationFee(Double price, Double cancelationFee) {
         return price + price * cancelationFee / 100;
     }

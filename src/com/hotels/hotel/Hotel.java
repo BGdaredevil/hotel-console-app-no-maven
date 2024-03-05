@@ -43,6 +43,19 @@ public class Hotel {
         return item.deleted;
     }
 
+    public Map<String, String> viewRooms() {
+        String[] types = this.rooms.stream().map(r -> r.getClass().getName()).distinct().toArray(String[]::new);
+        Map<String, String> result = new HashMap<>(types.length);
+
+        for (String type : types) {
+            Optional<String> item = this.rooms.stream().filter(e -> e.getClass().getName().equals(type)).map(e -> String.format("%s", e.getSpecification())).findFirst();
+
+            item.ifPresent(s -> result.put(type, s));
+        }
+
+        return result;
+    }
+
     // todo:
     // edit rooms
     // income

@@ -29,4 +29,13 @@ public final class Validators {
         return Validators.lessThan(max, value) && Validators.moreThan(min, value);
     }
 
+    public static <T extends String> boolean verifyInteger(T value) {
+        try {
+            int item = Integer.parseInt(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 }

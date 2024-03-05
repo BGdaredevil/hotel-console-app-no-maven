@@ -54,34 +54,6 @@ public class Menu {
 
         System.out.println(String.join("\n", mainMenuItems));
 
-//        String[] mainMenuGuest = {
-//                "====== MAIN MENU ======",
-//                "1. Select Hotel",
-//                "2. Book a Room",
-//                "3. Cancel booking",
-//                "4. Login",
-//                "5. Register",
-//                "9. Exit",
-//                "Please select an item: "
-//        };
-//
-//        String[] mainMenuUser = {
-//                "====== MAIN MENU ======",
-//                "1. Select Hotel",
-////                "View Rooms"
-//                "2. Book a Room",
-//                "3. Cancel booking",
-//                "4. Personal profile",
-//                "5. Admin portal",
-//                "6. Logout",
-//                "9. Exit",
-//                "Please select an item: "
-//        };
-
-//        mainMenuUser[0] = heading.toString();
-//        mainMenuGuest[0] = heading.toString();
-//
-//        System.out.print(String.join("\n", isGuest ? mainMenuGuest : mainMenuUser));
         int selection;
 
         do {
@@ -120,8 +92,9 @@ public class Menu {
 //              "2. View Rooms || Login || Personal profile"
                 case 2: {
                     if (isHotel) {
-                        // View Rooms
-                        return parrentMenu.subMenuOne(sc, parrentMenu);
+                        System.out.printf("Hotel %s offers the following options:\n", Hotel.getName(hotelContext));
+                        System.out.println(String.join("\n", hotelContext.viewRooms().values().stream().map(e -> String.format("%s", e)).toArray(String[]::new)));
+                        break;
                     }
 
                     if (isGuest) {
@@ -135,7 +108,7 @@ public class Menu {
                 case 3: {
                     if (isHotel) {
                         // Book a Room
-                        return parrentMenu.subMenuOne(sc, parrentMenu);
+                        return parrentMenu.bookRoomForm(sc, parrentMenu, new HashMap<>());
                     }
 
                     if (isGuest) {
@@ -600,6 +573,71 @@ public class Menu {
             System.out.println(Color.color("red", "Invalid selection"));
             return getSelection(sc);
         }
+    }
+
+    private Menu bookRoomForm(Scanner sc, Menu parrentMenu, Map<String, FormDataItem<?>> formData) {
+        if (formData.isEmpty()) {
+
+            formData.put("personCount", new FormDataItem<>("", (v) -> {
+                boolean isInt = Validators.verifyInteger(v);
+                if (isInt) {
+                    return Validators.moreThan(1, Integer.parseInt(v));
+                }
+                return false;
+            }, "Please input an integer."));
+            formData.put("startDateField", new FormDataItem<>("", (v) -> true, "Please input a valid date between year 1900 and 2100 in the following format DD.MM.YYYY"));
+            formData.put("endDateField", new FormDataItem<>("", (v) -> true, "Please input a valid date between year 1900 and 2100 in the following format DD.MM.YYYY"));
+        }
+
+        FormDataItem<String> personCountField = (FormDataItem<String>) formData.get("personCount");
+        FormDataItem<String> startDateField = (FormDataItem<String>) formData.get("startDateField");
+        FormDataItem<String> endDateField = (FormDataItem<String>) formData.get("endDateField");
+
+        String[] bookRoomMenu = {
+                "====== BOOK A ROOM ======",
+                String.format("1. Person count: %s", formData.get("personCount").getState(false)),
+                String.format("2. Start Date (DD.MM.YYYY): %s", formData.get("startDateField").getState(false)),
+                String.format("3. Start Date (DD.MM.YYYY): %s", formData.get("endDateField").getState(false)),
+                "4. Search"
+        };
+
+        System.out.print(String.join("\n", bookRoomMenu));
+
+        int selection;
+
+        do {
+            selection = Integer.parseInt(sc.nextLine());
+
+            switch (selection) {
+                case 1:
+                    System.out.print("Input: ");
+                    personCountField.setValue(sc.nextLine());
+                    return parrentMenu.bookRoomForm(sc, parrentMenu, formData);
+                case 2:
+                    System.out.print("Input: ");
+                    startDateField.setValue(sc.nextLine());
+                    return parrentMenu.bookRoomForm(sc, parrentMenu, formData);
+                case 3:
+                    System.out.print("Input: ");
+                    endDateField.setValue(sc.nextLine());
+                    return parrentMenu.bookRoomForm(sc, parrentMenu, formData);
+                case 4:
+                    System.out.println("submitted");
+                    return parrentMenu.bookRoomForm(sc, parrentMenu, formData);
+
+
+
+                case 9:
+                    return parrentMenu.mainMenu(sc, parrentMenu);
+                default:
+
+                    System.out.println(Color.color("red", "Invalid selection"));
+
+            }
+
+        } while (selection != 9);
+
+        return parrentMenu;
     }
 
     private Menu subMenuOne(Scanner sc, Menu parrentMenu) {
